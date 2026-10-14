@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechVengers Group - HCI 2 Prefinals</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  overflow-x: hidden;
+}
+.animated-bg {
+  background: linear-gradient(135deg, #07090e, #131726, #090d16, #07090e);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+.animated-bg.light-mode {
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9, #e2e8f0, #f8fafc);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.neon-glow {
+  filter: drop-shadow(0 0 14px rgba(0,243,255,0.85));
+}
+.page-transition {
+  animation: fadeInScale 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes fadeInScale {
+  0% { opacity: 0; transform: translateY(12px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes spinSlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.loading-spinner {
+  border: 4px solid rgba(0, 243, 255, 0.15);
+  border-left-color: #00f3ff;
+  border-radius: 50%;
+  width: 54px;
+  height: 54px;
+  animation: spinSlow 0.8s linear infinite;
+}
+</style>
+</head>
+<body class="animated-bg text-slate-100 min-h-screen flex flex-col justify-between transition-colors duration-500" id="bodyRoot">
+
+<header class="w-full p-4 flex justify-between items-center z-40">
+  <div class="flex items-center gap-3">
+    <div class="w-11 h-11 rounded-xl bg-slate-950 border border-cyan-500/50 flex items-center justify-center shadow-xl">
+      <svg viewBox="0 0 500 400" class="w-7 h-7 neon-glow">
+        <g fill="none" stroke="#00f3ff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="90" cy="90" r="25"/>
+          <path d="M90 115 v90 l-25 100 m25 -100 l25 100"/>
+          <path d="M55 145 h70"/>
+          <circle cx="170" cy="75" r="25"/>
+          <path d="M170 100 v95 l-25 100 m25 -100 l25 100"/>
+          <path d="M135 130 h70"/>
+          <circle cx="250" cy="50" r="30"/>
+          <path d="M250 80 v120 l-30 110 m30 -110 l30 110"/>
+          <path d="M210 110 h80"/>
+          <circle cx="330" cy="75" r="25"/>
+          <path d="M330 100 v95 l-25 100 m25 -100 l25 100"/>
+          <path d="M295 130 h70"/>
+          <circle cx="410" cy="90" r="25"/>
+          <path d="M410 115 v90 l-25 100 m25 -100 l25 100"/>
+          <path d="M375 145 h70"/>
+        </g>
+      </svg>
+    </div>
+    <span class="font-extrabold tracking-wider text-xl bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">TechVengers Group</span>
+  </div>
+</header>
+
+<main id="mainContainer" class="flex-grow flex items-center justify-center p-4 w-full">
+</main>
+
+<footer class="w-full p-4 flex justify-center items-center gap-4 z-40">
+  <button onclick="toggleDeviceMode()" id="deviceToggleBtn" class="p-3.5 rounded-full bg-slate-900/90 hover:bg-slate-800 text-cyan-400 border border-cyan-500/40 shadow-xl transition transform hover:scale-105">
+    <i id="deviceIcon" class="fa-solid fa-desktop text-lg"></i>
+  </button>
+  <button onclick="toggleThemeMode()" id="themeToggleBtn" class="p-3.5 rounded-full bg-slate-900/90 hover:bg-slate-800 text-amber-400 border border-amber-500/40 shadow-xl transition transform hover:scale-105">
+    <i id="themeIcon" class="fa-solid fa-sun text-lg"></i>
+  </button>
+</footer>
+
+<div id="loadingOverlay" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden flex-col items-center justify-center z-50">
+  <div class="loading-spinner mb-5"></div>
+  <p class="text-white font-semibold text-lg tracking-wide animate-pulse">Loading, Please Wait...</p>
+</div>
+
+<div id="modalOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+  <div id="modalCard" class="bg-slate-900 border border-cyan-500/40 p-6 rounded-2xl max-w-sm w-full shadow-2xl text-center page-transition text-white">
+    <div class="w-12 h-12 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center mx-auto mb-4 text-xl">
+      <i id="modalIcon" class="fa-solid fa-info"></i>
+    </div>
+    <h3 id="modalTitle" class="text-lg font-bold text-white mb-2">Notification</h3>
+    <p id="modalMessage" class="text-sm text-slate-300 mb-6">Message content.</p>
+    <button onclick="closeModal()" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl shadow-lg hover:opacity-90 transition">OK</button>
+  </div>
+</div>
+
+<script>
+let currentView = 'login';
+let isPCMode = false;
+let isLightMode = false;
+
+function showLoading() {
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.classList.remove('hidden');
+  overlay.classList.add('flex');
+}
+
+function hideLoading() {
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.classList.remove('flex');
+  overlay.classList.add('hidden');
+}
+
+function showModal(title, message, type = 'info') {
+  const overlay = document.getElementById('modalOverlay');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalMessage = document.getElementById('modalMessage');
+  const modalIcon = document.getElementById('modalIcon');
+  
+  modalTitle.innerText = title;
+  modalMessage.innerText = message;
+  
+  if(type === 'success') {
+    modalIcon.className = 'fa-solid fa-check';
+  } else if(type === 'error') {
+    modalIcon.className = 'fa-solid fa-triangle-exclamation';
+  } else {
+    modalIcon.className = 'fa-solid fa-info';
+  }
+  
+  overlay.classList.remove('hidden');
+  overlay.classList.add('flex');
+}
+
+function closeModal() {
+  const overlay = document.getElementById('modalOverlay');
+  overlay.classList.remove('flex');
+  overlay.classList.add('hidden');
+}
+
+function toggleDeviceMode() {
+  isPCMode = !isPCMode;
+  const icon = document.getElementById('deviceIcon');
+  if(isPCMode) {
+    icon.className = 'fa-solid fa-mobile-screen text-lg';
+  } else {
+    icon.className = 'fa-solid fa-desktop text-lg';
+  }
+  renderApp();
+}
+
+function toggleThemeMode() {
+  isLightMode = !isLightMode;
+  const icon = document.getElementById('themeIcon');
+  const body = document.getElementById('bodyRoot');
+  if(isLightMode) {
+    icon.className = 'fa-solid fa-moon text-lg text-indigo-300';
+    body.classList.add('light-mode');
+  } else {
+    icon.className = 'fa-solid fa-sun text-lg text-amber-400';
+    body.classList.remove('light-mode');
+  }
+  renderApp();
+}
+
+function switchView(viewName) {
+  currentView = viewName;
+  renderApp();
+}
+
+function togglePasswordVisibility(fieldId, btnId) {
+  const input = document.getElementById(fieldId);
+  const btnIcon = document.getElementById(btnId);
+  if(input.type === 'password') {
+    input.type = 'text';
+    btnIcon.className = 'fa-solid fa-eye-slash';
+  } else {
+    input.type = 'password';
+    btnIcon.className = 'fa-solid fa-eye';
+  }
+}
+
+function renderApp() {
+  const main = document.getElementById('mainContainer');
+  main.innerHTML = '';
+  
+  if(isPCMode) {
+    renderPCLayout(main);
+  } else {
+    renderMobileLayout(main);
+  }
+}
+
+function renderLogoSVG(customClass = "w-24 h-24") {
+  return `
+    <div class="p-4 rounded-2xl bg-slate-950 border border-cyan-500/40 shadow-2xl inline-block">
+      <svg viewBox="0 0 500 400" class="${customClass} neon-glow mx-auto">
+        <g fill="none" stroke="#00f3ff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="90" cy="90" r="25"/>
+          <path d="M90 115 v90 l-25 100 m25 -100 l25 100"/>
+          <path d="M55 145 h70"/>
+          <circle cx="170" cy="75" r="25"/>
+          <path d="M170 100 v95 l-25 100 m25 -100 l25 100"/>
+          <path d="M135 130 h70"/>
+          <circle cx="250" cy="50" r="30"/>
+          <path d="M250 80 v120 l-30 110 m30 -110 l30 110"/>
+          <path d="M210 110 h80"/>
+          <circle cx="330" cy="75" r="25"/>
+          <path d="M330 100 v95 l-25 100 m25 -100 l25 100"/>
+          <path d="M295 130 h70"/>
+          <circle cx="410" cy="90" r="25"/>
+          <path d="M410 115 v90 l-25 100 m25 -100 l25 100"/>
+          <path d="M375 145 h70"/>
+        </g>
+      </svg>
+    </div>
+  `;
+}
+
+function renderMobileLayout(container) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'w-full max-w-md mx-auto page-transition';
+  
+  const cardBg = isLightMode ? 'bg-white text-slate-900 border-slate-300 shadow-2xl' : 'bg-slate-900 text-slate-100 border-slate-800 shadow-2xl';
+  const headerBg = isLightMode ? 'bg-slate-950 text-white' : 'bg-slate-950 text-white';
+  const labelColor = isLightMode ? 'text-slate-900 font-bold' : 'text-slate-200 font-semibold';
+  const inputClass = isLightMode ? 'bg-slate-100 border-slate-300 text-slate-900 placeholder-slate-500 focus:border-cyan-600 font-medium' : 'bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus:border-cyan-400';
+  const linkColor = isLightMode ? 'text-cyan-700 hover:text-cyan-900 font-semibold' : 'text-cyan-400 hover:text-cyan-300 font-medium';
+  
+  if(currentView === 'login') {
+    wrapper.innerHTML = `
+      <div class="rounded-3xl overflow-hidden border ${cardBg}">
+        <div class="p-8 pb-12 ${headerBg} relative overflow-hidden text-center">
+          <div class="relative z-10">
+            <div class="mb-4 inline-block">${renderLogoSVG("w-20 h-20")}</div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-white">Login</h1>
+            <p class="text-sm text-cyan-400 mt-1 font-medium">Sign in to continue.</p>
+          </div>
+        </div>
+        <div class="p-8 -mt-6 rounded-t-3xl ${cardBg} relative z-20">
+          <form onsubmit="handleLogin(event)" class="space-y-5">
+            <div>
+              <label class="block text-xs uppercase tracking-wider mb-2 ${labelColor}">Name</label>
+              <input type="text" id="loginName" required placeholder="Juan Dela Cruz" class="w-full px-4 py-3 rounded-xl border ${inputClass} outline-none transition">
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-wider mb-2 ${labelColor}">Password</label>
+              <div class="relative">
+                <input type="password" id="loginPass" required placeholder="********" class="w-full px-4 py-3 pr-12 rounded-xl border ${inputClass} outline-none transition">
+                <button type="button" onclick="togglePasswordVisibility('loginPass', 'loginEye')" class="absolute right-4 top-3.5 text-slate-400 hover:text-cyan-500">
+                  <i id="loginEye" class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition transform active:scale-95">Log in</button>
+          </form>
+          <div class="mt-6 text-center space-y-3">
+            <button onclick="handleForgotPass()" class="text-xs ${linkColor}">Forgot Password?</button>
+            <div>
+              <button onclick="switchView('register')" class="text-xs ${isLightMode ? 'text-slate-800 hover:text-slate-950 font-bold' : 'text-slate-300 hover:text-white'} transition">Don't have an account? Register here.</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if(currentView === 'register') {
+    wrapper.innerHTML = `
+      <div class="rounded-3xl overflow-hidden border ${cardBg}">
+        <div class="p-6 pb-10 ${headerBg} relative text-center">
+          <button onclick="switchView('login')" class="absolute left-6 top-6 w-10 h-10 rounded-full bg-slate-900 hover:bg-slate-800 flex items-center justify-center text-cyan-400 border border-cyan-500/40 transition">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <div class="mb-3 inline-block">${renderLogoSVG("w-16 h-16")}</div>
+          <h1 class="text-2xl font-extrabold tracking-tight text-white">Create New Account</h1>
+        </div>
+        <div class="p-6 -mt-6 rounded-t-3xl ${cardBg} relative z-20">
+          <form onsubmit="handleRegister(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs uppercase tracking-wider mb-1 ${labelColor}">Name</label>
+              <input type="text" id="regName" required placeholder="Juan Dela Cruz" class="w-full px-3 py-2.5 rounded-xl border ${inputClass} outline-none transition text-sm">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs uppercase tracking-wider mb-1 ${labelColor}">Year</label>
+                <select id="regYear" required class="w-full px-3 py-2.5 rounded-xl border ${inputClass} outline-none transition text-sm">
+                  <option value="" disabled selected>Select Year</option>
+                  <option value="1st">1st Year</option>
+                  <option value="2nd">2nd Year</option>
+                  <option value="3rd">3rd Year</option>
+                  <option value="4th">4th Year</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs uppercase tracking-wider mb-1 ${labelColor}">Course</label>
+                <select id="regCourse" required class="w-full px-3 py-2.5 rounded-xl border ${inputClass} outline-none transition text-sm">
+                  <option value="" disabled selected>Select Course</option>
+                  <option value="BSIT">BSIT</option>
+                  <option value="BSOA">BSOA</option>
+                  <option value="BSCS">BSCS</option>
+                  <option value="BSIS">BSIS</option>
+                  <option value="ACT">ACT</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-wider mb-1 ${labelColor}">Address</label>
+              <input type="text" id="regAddress" required placeholder="Legazpi City, Albay" class="w-full px-3 py-2.5 rounded-xl border ${inputClass} outline-none transition text-sm">
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-wider mb-1 ${labelColor}">Email Address</label>
+              <input type="email" id="regEmail" required placeholder="delacruzjuan123@gmail.com" class="w-full px-3 py-2.5 rounded-xl border ${inputClass} outline-none transition text-sm">
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-wider mb-1 ${labelColor}">Password</label>
+              <div class="relative">
+                <input type="password" id="regPass" required placeholder="********" class="w-full px-3 py-2.5 pr-10 rounded-xl border ${inputClass} outline-none transition text-sm">
+                <button type="button" onclick="togglePasswordVisibility('regPass', 'regEye')" class="absolute right-3.5 top-3 text-slate-400 hover:text-cyan-500">
+                  <i id="regEye" class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition transform active:scale-95 text-sm">Sign up</button>
+          </form>
+          <div class="mt-4 text-center">
+            <button onclick="switchView('login')" class="text-xs ${linkColor}">Already Registered? Proceed to Login.</button>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if(currentView === 'dashboard') {
+    const user = JSON.parse(localStorage.getItem('techvengers_logged_in') || '{}');
+    const infoBoxClass = isLightMode ? 'bg-slate-100 border border-slate-300 text-slate-900' : 'bg-slate-800/60 border border-slate-700/60 text-slate-200';
+    wrapper.innerHTML = `
+      <div class="rounded-3xl overflow-hidden border ${cardBg} p-6">
+        <div class="flex items-center justify-between pb-6 border-b ${isLightMode ? 'border-slate-200' : 'border-slate-800'}">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-lg">
+              ${user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+            </div>
+            <div>
+              <h2 class="font-bold text-lg ${isLightMode ? 'text-slate-900' : 'text-white'}">${user.name || 'Student'}</h2>
+              <p class="text-xs text-cyan-500 font-bold">${user.course || 'BSIT'} - ${user.year || '1st'} Year</p>
+            </div>
+          </div>
+          <button onclick="handleLogout()" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs font-bold rounded-xl border border-red-500/30 transition">
+            <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout
+          </button>
+        </div>
+        <div class="py-6 space-y-4">
+          <div class="p-4 rounded-2xl ${infoBoxClass}">
+            <span class="block text-xs font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-1">Email Address</span>
+            <span class="text-sm font-semibold">${user.email || 'N/A'}</span>
+          </div>
+          <div class="p-4 rounded-2xl ${infoBoxClass}">
+            <span class="block text-xs font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-1">Address</span>
+            <span class="text-sm font-semibold">${user.address || 'N/A'}</span>
+          </div>
+          <div class="p-4 rounded-2xl ${infoBoxClass} flex items-center justify-between">
+            <div>
+              <span class="block text-xs font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-1">Registered Student of</span>
+              <span class="text-base font-extrabold ${isLightMode ? 'text-slate-900' : 'text-white'}">CCDI Legazpi</span>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-500 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+          </div>
+        </div>
+        <div class="pt-2">
+          <div class="w-full py-3 bg-cyan-500/10 border border-cyan-500/30 rounded-2xl text-center">
+            <span class="text-xs font-bold text-cyan-500">Student Portal Active & Verified</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  container.appendChild(wrapper);
+}
+
+function renderPCLayout(container) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'w-full max-w-6xl mx-auto px-6 py-12 flex flex-col lg:flex-row items-center justify-between gap-12 page-transition';
+  
+  const cardBg = isLightMode ? 'bg-white text-slate-900 border-slate-300 shadow-2xl' : 'bg-slate-900 text-slate-100 border-slate-800 shadow-2xl';
+  const labelColor = isLightMode ? 'text-slate-900 font-bold' : 'text-slate-200 font-semibold';
+  const inputClass = isLightMode ? 'bg-slate-100 border-slate-300 text-slate-900 placeholder-slate-500 focus:border-cyan-600 font-medium' : 'bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus:border-cyan-400';
+  const linkColor = isLightMode ? 'text-cyan-700 hover:text-cyan-900 font-semibold' : 'text-cyan-400 hover:text-cyan-300 font-medium';
+  
+  if(currentView === 'login') {
+    wrapper.innerHTML = `
+      <div class="lg:w-1/2 text-left space-y-6">
+        <div class="inline-block">${renderLogoSVG("w-32 h-32")}</div>
+        <h1 class="text-5xl lg:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">A Student Portal</h1>
+        <p class="text-lg ${isLightMode ? 'text-slate-800 font-medium' : 'text-slate-300'} max-w-lg leading-relaxed">Welcome to TechVengers Student Portal. Access your student profile, manage coursework, and connect seamlessly with your academic dashboard.</p>
+      </div>
+      <div class="lg:w-1/2 w-full max-w-md">
+        <div class="rounded-3xl overflow-hidden border ${cardBg} p-8">
+          <h2 class="text-2xl font-bold mb-6 ${isLightMode ? 'text-slate-900' : 'text-white'}">Login</h2>
+          <form onsubmit="handleLogin(event)" class="space-y-5">
+            <div>
+              <label class="block text-xs uppercase tracking-wider mb-2 ${labelColor}">Name</label>
+              <input type="text" id="loginName" required placeholder="Juan Dela Cruz" class="w-full px-4 py-3 rounded-xl border ${inputClass} outline-none transition">
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-wider mb-2 ${labelColor}">Password</label>
+              <div class="relative">
+                <input type="password" id="loginPass" required placeholder="********" class="w-full px-4 py-3 pr-12 rounded-xl border ${inputClass} outline-none transition">
+                <button type="button" onclick="togglePasswordVisibility('loginPass', 'loginEye')" class="absolute right-4 top-3.5 text-slate-400 hover:text-cyan-500">
+                  <i id="loginEye" class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition transform active:scale-95">Log in</button>
+          </form>
+          <div class="mt-6 text-center space-y-3">
+            <button onclick="handleForgotPass()" class="text-xs ${linkColor}">Forgot Password?</button>
+            <div>
+              <button onclick="switchView('register')" class="text-xs ${isLightMode ? 'text-slate-800 hover:text-slate-950 font-bold' : 'text-slate-300 hover:text-white'} transition">Don't have an account? Register here.</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if(currentView === 'register') {
+    wrapper.innerHTML = `
+      <div class="lg:w-1/2 text-left space-y-6">
+        <button onclick="switchView('login')" class="w-10 h-10 rounded-full bg-slate-900 hover:bg-slate-800 flex items-center justify-center text-cyan-400 border border-cyan-500/40 transition">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <div class="inline-block">${renderLogoSVG("w-28 h-28")}</div>
+        <h1 class="text-4xl lg:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Create New Account</h1>
+        <p class="text-sm ${isLightMode ? 'text-slate-800 font-medium' : 'text-slate-300'} max-w-sm">Fill out the form to register your account into the TechVengers Student Portal.</p>
+      </div>
+      <div class="lg:w-1/2 w-full max-w-md">
+        <div class="rounded-3xl overflow-hidden border ${cardBg} p-8">
+          <form onsubmit="handleRegister(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs uppercase tracking-wider mb-1 ${labelColor}">Name</label>
+              <input type="text" id="regName" required placeholder="Juan Dela Cruz" class="w-full px-3 py-2.5 rounded-xl border ${inputClass} outline-none transition text-sm">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs uppercase tracking-wider mb-1 ${labelColor}">Year</label>
+                <select id="regYear" required class="w-full px-3 py-2.5 rounded-xl border ${inputClass} outline-none transition text-sm">
+                  <option value="" disabled selected>Select Year</option>
+                  <option value="1st">1st Year</option>
+                  <option value="2nd">2nd Year</option>
+                  <option value="3rd">3rd Year</option>
+                  <option value="4th">4th Year</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs uppercase tracking-wider mb-1 ${labelColor}">Course</label>
+                <select id="regCourse" required class="w-full px-3 py-2.5 rounded-xl border ${inputClass} outline-none transition text-sm">
+                  <option value="" disabled selected>Select Course</option>
+                  <option value="BSIT">BSIT</option>
+                  <option value="BSOA">BSOA</option>
+                  <option value="BSCS">BSCS</option>
+                  <option value="BSIS">BSIS</option>
+                  <option value="ACT">ACT</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-wider mb-1 ${labelColor}">Address</label>
+              <input type="text" id="regAddress" required placeholder="Legazpi City, Albay" class="w-full px-3 py-2.5 rounded-xl border ${inputClass} outline-none transition text-sm">
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-wider mb-1 ${labelColor}">Email Address</label>
+              <input type="email" id="regEmail" required placeholder="delacruzjuan123@gmail.com" class="w-full px-3 py-2.5 rounded-xl border ${inputClass} outline-none transition text-sm">
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-wider mb-1 ${labelColor}">Password</label>
+              <div class="relative">
+                <input type="password" id="regPass" required placeholder="********" class="w-full px-3 py-2.5 pr-10 rounded-xl border ${inputClass} outline-none transition text-sm">
+                <button type="button" onclick="togglePasswordVisibility('regPass', 'regEye')" class="absolute right-3.5 top-3 text-slate-400 hover:text-cyan-500">
+                  <i id="regEye" class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition transform active:scale-95 text-sm">Sign up</button>
+          </form>
+          <div class="mt-4 text-center">
+            <button onclick="switchView('login')" class="text-xs ${linkColor}">Already Registered? Proceed to Login.</button>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if(currentView === 'dashboard') {
+    const user = JSON.parse(localStorage.getItem('techvengers_logged_in') || '{}');
+    const infoBoxClass = isLightMode ? 'bg-slate-100 border border-slate-300 text-slate-900' : 'bg-slate-800/60 border border-slate-700/60 text-slate-200';
+    wrapper.innerHTML = `
+      <div class="lg:w-1/3 text-left space-y-6">
+        <div class="inline-block">${renderLogoSVG("w-28 h-28")}</div>
+        <h1 class="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Student Dashboard</h1>
+        <p class="text-sm ${isLightMode ? 'text-slate-800 font-medium' : 'text-slate-300'}">Welcome back, ${user.name || 'Student'}. Manage your portal account and review your registered information.</p>
+        <button onclick="handleLogout()" class="px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold rounded-xl border border-red-500/30 transition">
+          <i class="fa-solid fa-right-from-bracket mr-2"></i> Logout
+        </button>
+      </div>
+      <div class="lg:w-2/3 w-full max-w-xl">
+        <div class="rounded-3xl overflow-hidden border ${cardBg} p-8 space-y-6">
+          <div class="flex items-center gap-4 pb-6 border-b ${isLightMode ? 'border-slate-200' : 'border-slate-800'}">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white flex items-center justify-center font-bold text-2xl shadow-lg">
+              ${user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+            </div>
+            <div>
+              <h2 class="font-bold text-xl ${isLightMode ? 'text-slate-900' : 'text-white'}">${user.name || 'Student'}</h2>
+              <p class="text-sm text-cyan-500 font-bold">${user.course || 'BSIT'} • ${user.year || '1st'} Year</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 rounded-2xl ${infoBoxClass}">
+              <span class="block text-xs font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-1">Email Address</span>
+              <span class="text-sm font-semibold">${user.email || 'N/A'}</span>
+            </div>
+            <div class="p-4 rounded-2xl ${infoBoxClass}">
+              <span class="block text-xs font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-1">Address</span>
+              <span class="text-sm font-semibold">${user.address || 'N/A'}</span>
+            </div>
+          </div>
+          <div class="p-4 rounded-2xl ${infoBoxClass} flex items-center justify-between">
+            <div>
+              <span class="block text-xs font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-1">Registered Student of</span>
+              <span class="text-base font-extrabold ${isLightMode ? 'text-slate-900' : 'text-white'}">CCDI Legazpi</span>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-500 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  container.appendChild(wrapper);
+}
+
+function handleRegister(e) {
+  e.preventDefault();
+  const name = document.getElementById('regName').value.trim();
+  const year = document.getElementById('regYear').value;
+  const course = document.getElementById('regCourse').value;
+  const address = document.getElementById('regAddress').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPass').value;
+  
+  let users = JSON.parse(localStorage.getItem('techvengers_users') || '[]');
+  
+  const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase() || u.name.toLowerCase() === name.toLowerCase());
+  if(existingUser) {
+    showModal('Registration Notice', 'An account with this name or email already exists. You can log in directly.', 'error');
+    return;
+  }
+  
+  showLoading();
+  
+  setTimeout(() => {
+    hideLoading();
+    const newUser = { name, year, course, address, email, password };
+    users.push(newUser);
+    localStorage.setItem('techvengers_users', JSON.stringify(users));
+    localStorage.setItem('techvengers_logged_in', JSON.stringify(newUser));
+    
+    showModal('Success!', 'Account successfully created and registered!', 'success');
+    setTimeout(() => {
+      closeModal();
+      switchView('dashboard');
+    }, 1000);
+  }, 1800);
+}
+
+function handleLogin(e) {
+  e.preventDefault();
+  const loginInput = document.getElementById('loginName').value.trim();
+  const password = document.getElementById('loginPass').value;
+  
+  const users = JSON.parse(localStorage.getItem('techvengers_users') || '[]');
+  const user = users.find(u => u.name.toLowerCase() === loginInput.toLowerCase() || u.email.toLowerCase() === loginInput.toLowerCase());
+  
+  if(!user) {
+    showModal('Login Failed', 'This user isn\'t registered yet.', 'error');
+    return;
+  }
+  
+  if(user.password !== password) {
+    showModal('Login Failed', 'Wrong password.', 'error');
+    return;
+  }
+  
+  showLoading();
+  
+  setTimeout(() => {
+    hideLoading();
+    localStorage.setItem('techvengers_logged_in', JSON.stringify(user));
+    switchView('dashboard');
+  }, 1800);
+}
+
+function handleForgotPass() {
+  showModal('Password Reset', 'The link to reset your password has been sent to your registered email.', 'info');
+}
+
+function handleLogout() {
+  localStorage.removeItem('techvengers_logged_in');
+  switchView('login');
+}
+
+window.onload = function() {
+  const loggedIn = localStorage.getItem('techvengers_logged_in');
+  if(loggedIn) {
+    currentView = 'dashboard';
+  }
+  renderApp();
+};
+</script>
+</body>
+</html>
